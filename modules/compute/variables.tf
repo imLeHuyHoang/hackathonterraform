@@ -1,0 +1,89 @@
+# Compute Module Variables
+
+variable "project_name" {
+  description = "Name of the project"
+  type        = string
+}
+
+variable "environment" {
+  description = "Deployment environment (dev, staging, prod)"
+  type        = string
+}
+
+# Dependencies from foundation module
+variable "lambda_execution_role_arn" {
+  description = "ARN of the Lambda execution role"
+  type        = string
+}
+
+variable "vpc_id" {
+  description = "VPC ID for Lambda functions"
+  type        = string
+}
+
+variable "lambda_security_group_id" {
+  description = "Security group ID for Lambda functions"
+  type        = string
+}
+
+variable "private_subnet_ids" {
+  description = "Private subnet IDs for Lambda functions"
+  type        = list(string)
+  default     = []  # Empty means Lambda runs outside VPC
+}
+
+# Dependencies from storage module
+variable "main_bucket_id" {
+  description = "Main S3 bucket ID"
+  type        = string
+}
+
+variable "main_bucket_arn" {
+  description = "Main S3 bucket ARN"
+  type        = string
+}
+
+variable "lambda_code_bucket_id" {
+  description = "Lambda code S3 bucket ID"
+  type        = string
+}
+
+variable "lambda_deployment_package_key" {
+  description = "S3 key of the Lambda deployment package"
+  type        = string
+}
+
+variable "raw_data_prefix" {
+  description = "S3 prefix for raw vulnerability data"
+  type        = string
+}
+
+variable "processed_data_prefix" {
+  description = "S3 prefix for processed data"
+  type        = string
+}
+
+variable "deployment_packages_prefix" {
+  description = "S3 prefix for deployment packages"
+  type        = string
+}
+
+# GitHub Configuration
+variable "github_repo_url" {
+  description = "GitHub repository URL for source code"
+  type        = string
+  default     = "https://github.com/imLeHuyHoang/vulnerability-scripts.git"
+}
+
+# Lambda Configuration
+variable "lambda_timeout" {
+  description = "Lambda function timeout in seconds"
+  type        = number
+  default     = 600
+}
+
+variable "lambda_memory_size" {
+  description = "Lambda function memory size in MB"
+  type        = number
+  default     = 512
+}
