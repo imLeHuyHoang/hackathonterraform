@@ -57,3 +57,28 @@ output "log_group_names" {
     package_creator = aws_cloudwatch_log_group.package_creator_logs.name
   }
 }
+
+# Ec2 output
+output "win2016_instance_id" {
+  value = aws_instance.win2016.id
+}
+
+output "win2019_instance_id" {
+  value = aws_instance.win2019.id
+}
+
+output "win2022_instance_id" {
+  value = aws_instance.win2022.id
+}
+
+output "win2016_private_ip" {
+  value = aws_instance.win2016.private_ip
+}
+
+output "win2019_private_ip" {
+  value = aws_instance.win2019.private_ip
+}
+
+output "win2022_private_ip" {
+  value = aws_instance.win2022.private_ip
+}

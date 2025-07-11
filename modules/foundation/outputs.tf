@@ -67,3 +67,8 @@ output "eventbridge_service_role_arn" {
   description = "ARN of the EventBridge service role"
   value       = aws_iam_role.eventbridge_service.arn
 }
+
+output "ec2_instance_role_name" {
+  description = "Name of the EC2 instance IAM role"
+  value       = aws_iam_role.ec2_instance.name
+}

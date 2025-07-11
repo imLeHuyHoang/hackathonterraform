@@ -57,6 +57,16 @@ module "compute" {
   deployment_packages_prefix       = module.storage.deployment_packages_prefix
   
   depends_on = [module.foundation, module.storage]
+  
+  win2016_ami_id = var.win2016_ami_id
+  win2019_ami_id = var.win2019_ami_id
+  win2022_ami_id = var.win2022_ami_id
+  subnet_id = module.foundation.public_subnet_ids[0]
+  security_group_ids = [module.foundation.ec2_windows_security_group_id]
+  key_name = var.key_name
+  ec2_instance_role_name = module.foundation.ec2_instance_role_name
+
+  
 }
 
 # Create S3 bucket notifications after Lambda functions are created
@@ -78,3 +88,5 @@ resource "aws_s3_bucket_notification" "main_bucket_notification" {
     module.compute.lambda_permission_for_s3_data_processor
   ]
 }
+
+# Ec2 module

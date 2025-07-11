@@ -51,3 +51,25 @@ variable "windows_versions" {
     "Windows Server 2022"
   ]
 }
+
+# AMI IDs for Windows EC2 instances
+variable "win2016_ami_id" {
+  description = "AMI ID for Windows Server 2016"
+  type        = string
+}
+
+variable "win2019_ami_id" {
+  description = "AMI ID for Windows Server 2019"
+  type        = string
+}
+
+variable "win2022_ami_id" {
+  description = "AMI ID for Windows Server 2022"
+  type        = string
+}
+
+# EC2 Key Pair name
+variable "key_name" {
+  description = "SSH Key Pair name to access EC2 instances"
+  type        = string
+}

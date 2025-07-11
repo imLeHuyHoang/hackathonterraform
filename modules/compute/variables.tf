@@ -87,3 +87,49 @@ variable "lambda_memory_size" {
   type        = number
   default     = 512
 }
+
+#Ec2 config
+variable "win2016_ami_id" {
+  description = "AMI ID for Windows Server 2016"
+  type        = string
+}
+
+variable "win2019_ami_id" {
+  description = "AMI ID for Windows Server 2019"
+  type        = string
+}
+
+variable "win2022_ami_id" {
+  description = "AMI ID for Windows Server 2022"
+  type        = string
+}
+
+variable "ec2_instance_type" {
+  description = "EC2 Instance Type"
+  type        = string
+  default     = "t3.medium"
+}
+
+variable "subnet_id" {
+  description = "Subnet ID for EC2"
+  type        = string
+}
+
+variable "security_group_ids" {
+  description = "List of SG IDs"
+  type        = list(string)
+}
+
+variable "key_name" {
+  description = "EC2 SSH Key Pair name"
+  type        = string
+}
+
+variable "ec2_instance_role_name" {
+  description = "IAM role name attached to EC2"
+  type        = string
+}
+
+
+
+

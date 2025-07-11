@@ -2,10 +2,10 @@
 
 # Main S3 Bucket with folder structure
 resource "aws_s3_bucket" "main" {
-  bucket = "${local.resource_prefix}-vulnerability-data"
+  bucket = "${local.resource_prefix}-vulnerability-data-tienv"
   
   tags = merge(local.common_tags, {
-    Name        = "${local.resource_prefix}-vulnerability-data"
+    Name        = "${local.resource_prefix}-vulnerability-data-tienv"
     Purpose     = "VulnerabilityData"
   })
 }
@@ -96,10 +96,10 @@ resource "aws_s3_object" "deployment_packages_folder" {
 
 # Lambda Function Code Bucket
 resource "aws_s3_bucket" "lambda_code" {
-  bucket = "${local.resource_prefix}-lambda-code"
+  bucket = "${local.resource_prefix}-lambda-code-tienv"
   
   tags = merge(local.common_tags, {
-    Name        = "${local.resource_prefix}-lambda-code"
+    Name        = "${local.resource_prefix}-lambda-code-tienv"
     Purpose     = "Lambda function deployment packages"
     Description = "Stores Lambda function ZIP files and layers"
   })
@@ -161,10 +161,10 @@ resource "aws_s3_object" "lambda_deployment_package" {
 
 # Separate bucket for CodePipeline artifacts
 resource "aws_s3_bucket" "artifacts" {
-  bucket = "${local.resource_prefix}-pipeline-artifacts"
+  bucket = "${local.resource_prefix}-pipeline-artifacts-tienv"
   
   tags = merge(local.common_tags, {
-    Name        = "${local.resource_prefix}-pipeline-artifacts"
+    Name        = "${local.resource_prefix}-pipeline-artifacts-tienv"
     Purpose     = "CodePipeline artifacts storage"
     Description = "Stores CodePipeline build and deployment artifacts"
   })
