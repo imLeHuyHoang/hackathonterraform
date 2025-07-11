@@ -20,27 +20,15 @@ variable "codepipeline_role_arn" {
   type        = string
 }
 
-# Lambda function dependencies (will be passed from compute module)
+# Lambda function dependencies (simplified - only data processor)
 variable "data_processor_lambda_arn" {
   description = "ARN of the data processor Lambda function"
   type        = string
   default     = ""
 }
 
-variable "package_creator_lambda_arn" {
-  description = "ARN of the package creator Lambda function"
-  type        = string
-  default     = ""
-}
-
 variable "lambda_permission_for_s3_data_processor" {
   description = "Lambda permission resource for S3 to invoke data processor"
-  type        = string
-  default     = ""
-}
-
-variable "lambda_permission_for_s3_package_creator" {
-  description = "Lambda permission resource for S3 to invoke package creator"
   type        = string
   default     = ""
 }

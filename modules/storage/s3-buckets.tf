@@ -143,9 +143,9 @@ resource "aws_s3_bucket_public_access_block" "lambda_code" {
 # Upload existing lambda deployment package
 resource "aws_s3_object" "lambda_deployment_package" {
   bucket = aws_s3_bucket.lambda_code.id
-  key    = "lambda-deployment.zip"
-  source = "${path.root}/lamdafunction/new-lambda-deployment.zip"  # Updated path
-  etag   = filemd5("${path.root}/lamdafunction/new-lambda-deployment.zip")  # Updated path
+  key    = "fixed-lambda-deployment.zip"
+  source = "${path.root}/lamdafunction/fixed-lambda-deployment.zip"  # Updated path
+  etag   = filemd5("${path.root}/lamdafunction/fixed-lambda-deployment.zip")  # Updated path
   
   tags = merge(local.common_tags, {
     Purpose = "Lambda function deployment package"
