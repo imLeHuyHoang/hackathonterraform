@@ -73,3 +73,12 @@ variable "key_name" {
   description = "SSH Key Pair name to access EC2 instances"
   type        = string
 }
+
+
+variable "deployment_packages_prefix" {
+  description = "Prefix folder for deployment packages"
+  type        = string
+  default     = "deployment-packages"
+}
+
+

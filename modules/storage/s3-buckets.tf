@@ -229,3 +229,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "artifacts" {
     aws_s3_bucket_public_access_block.artifacts
   ]
 }
+
+resource "aws_s3_bucket_notification" "trigger_eventbridge" {
+  bucket      = aws_s3_bucket.main.id
+  eventbridge = true
+}

@@ -32,3 +32,9 @@ variable "lambda_permission_for_s3_data_processor" {
   type        = string
   default     = ""
 }
+
+variable "deployment_packages_prefix" {
+  description = "Prefix folder in S3 for deployment packages"
+  type        = string
+  default     = "deployment-packages/"
+}

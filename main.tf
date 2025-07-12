@@ -32,6 +32,8 @@ module "storage" {
   lambda_role_arn       = module.foundation.lambda_execution_role_arn
   codepipeline_role_arn = module.foundation.codepipeline_service_role_arn
 
+  deployment_packages_prefix = var.deployment_packages_prefix
+
   depends_on = [module.foundation]
 }
 
@@ -63,7 +65,8 @@ module "compute" {
   win2022_ami_id = var.win2022_ami_id
   subnet_id = module.foundation.public_subnet_ids[0]
   security_group_ids = [module.foundation.ec2_windows_security_group_id]
-  key_name = var.key_name
+  key_name         = "my-hackathon-key"
+  public_key_path  = "${path.root}/my-ec2-key.pub"
   ec2_instance_role_name = module.foundation.ec2_instance_role_name
 
   
@@ -89,4 +92,20 @@ resource "aws_s3_bucket_notification" "main_bucket_notification" {
   ]
 }
 
-# Ec2 module
+# CICD
+module "cicd" {
+  source = "./modules/cicd"
+
+  project_name = var.project_name
+  environment  = var.environment
+  eventbridge_service_role_arn = module.foundation.eventbridge_service_role_arn
+  main_bucket_name = module.storage.main_bucket_name 
+  artifacts_bucket_id = module.storage.artifacts_bucket_id
+  deployment_packages_prefix = module.storage.deployment_packages_prefix
+
+  codepipeline_service_role_arn = module.foundation.codepipeline_service_role_arn
+  codedeploy_service_role_arn   = module.foundation.codedeploy_service_role_arn
+}
+
+
+

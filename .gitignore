@@ -34,3 +34,6 @@ override.tf.json
 terraform.rc
 
 .terraform.lock.hcl
+
+my-ec2-key
+my-ec2-key.pub
