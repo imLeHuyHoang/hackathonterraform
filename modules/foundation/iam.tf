@@ -3,7 +3,7 @@
 # Lambda Execution Role
 resource "aws_iam_role" "lambda_execution" {
   name = "${local.resource_prefix}-lambda-execution-role"
-  
+
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
@@ -14,7 +14,7 @@ resource "aws_iam_role" "lambda_execution" {
       }
     }]
   })
-  
+
   tags = local.common_tags
 }
 
@@ -28,7 +28,7 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
 resource "aws_iam_policy" "lambda_s3_access" {
   name        = "${local.resource_prefix}-lambda-s3-policy"
   description = "Allows Lambda functions to access S3 buckets"
-  
+
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -59,7 +59,7 @@ resource "aws_iam_policy" "lambda_s3_access" {
       }
     ]
   })
-  
+
   tags = local.common_tags
 }
 
@@ -71,7 +71,7 @@ resource "aws_iam_role_policy_attachment" "lambda_s3_access" {
 # EC2 Instance Role
 resource "aws_iam_role" "ec2_instance" {
   name = "${local.resource_prefix}-ec2-instance-role"
-  
+
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
@@ -82,7 +82,7 @@ resource "aws_iam_role" "ec2_instance" {
       }
     }]
   })
-  
+
   tags = local.common_tags
 }
 
@@ -90,7 +90,7 @@ resource "aws_iam_role" "ec2_instance" {
 resource "aws_iam_instance_profile" "ec2_instance" {
   name = "${local.resource_prefix}-ec2-instance-profile"
   role = aws_iam_role.ec2_instance.name
-  
+
   tags = local.common_tags
 }
 
@@ -104,7 +104,7 @@ resource "aws_iam_role_policy_attachment" "ec2_ssm_managed_instance" {
 resource "aws_iam_policy" "ec2_codedeploy_agent" {
   name        = "${local.resource_prefix}-ec2-codedeploy-agent-policy"
   description = "Allows EC2 instances to work with CodeDeploy"
-  
+
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -112,6 +112,7 @@ resource "aws_iam_policy" "ec2_codedeploy_agent" {
         Effect = "Allow"
         Action = [
           "s3:GetObject",
+          "s3:GetObjectVersion",
           "s3:ListBucket"
         ]
         Resource = [
@@ -122,15 +123,25 @@ resource "aws_iam_policy" "ec2_codedeploy_agent" {
       {
         Effect = "Allow"
         Action = [
-          "s3:GetObject"
+          "s3:GetObject",
+          "s3:GetObjectVersion"
         ]
         Resource = [
           "arn:aws:s3:::aws-codedeploy-*/*"
         ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:ListBucket"
+        ]
+        Resource = [
+          "arn:aws:s3:::aws-codedeploy-*"
+        ]
       }
     ]
   })
-  
+
   tags = local.common_tags
 }
 
@@ -142,7 +153,7 @@ resource "aws_iam_role_policy_attachment" "ec2_codedeploy_agent" {
 # CodePipeline Service Role
 resource "aws_iam_role" "codepipeline_service" {
   name = "${local.resource_prefix}-codepipeline-service-role"
-  
+
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
@@ -153,7 +164,7 @@ resource "aws_iam_role" "codepipeline_service" {
       }
     }]
   })
-  
+
   tags = local.common_tags
 }
 
@@ -161,7 +172,7 @@ resource "aws_iam_role" "codepipeline_service" {
 resource "aws_iam_policy" "codepipeline_service" {
   name        = "${local.resource_prefix}-codepipeline-service-policy"
   description = "Policy for CodePipeline service role"
-  
+
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -193,7 +204,7 @@ resource "aws_iam_policy" "codepipeline_service" {
       }
     ]
   })
-  
+
   tags = local.common_tags
 }
 
@@ -205,7 +216,7 @@ resource "aws_iam_role_policy_attachment" "codepipeline_service" {
 # CodeDeploy Service Role
 resource "aws_iam_role" "codedeploy_service" {
   name = "${local.resource_prefix}-codedeploy-service-role"
-  
+
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
@@ -216,7 +227,7 @@ resource "aws_iam_role" "codedeploy_service" {
       }
     }]
   })
-  
+
   tags = local.common_tags
 }
 
@@ -229,7 +240,7 @@ resource "aws_iam_role_policy_attachment" "codedeploy_service" {
 # EventBridge Role (for S3 to CodePipeline integration)
 resource "aws_iam_role" "eventbridge_service" {
   name = "${local.resource_prefix}-eventbridge-service-role"
-  
+
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
@@ -240,7 +251,7 @@ resource "aws_iam_role" "eventbridge_service" {
       }
     }]
   })
-  
+
   tags = local.common_tags
 }
 
@@ -248,7 +259,7 @@ resource "aws_iam_role" "eventbridge_service" {
 resource "aws_iam_policy" "eventbridge_codepipeline" {
   name        = "${local.resource_prefix}-eventbridge-codepipeline-policy"
   description = "Allows EventBridge to trigger CodePipeline"
-  
+
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
@@ -259,7 +270,7 @@ resource "aws_iam_policy" "eventbridge_codepipeline" {
       Resource = "arn:aws:codepipeline:*:*:${local.resource_prefix}-*"
     }]
   })
-  
+
   tags = local.common_tags
 }
 

@@ -3,7 +3,7 @@
 # Main bucket policy
 resource "aws_s3_bucket_policy" "main" {
   bucket = aws_s3_bucket.main.id
-  
+
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -62,7 +62,7 @@ resource "aws_s3_bucket_policy" "main" {
 # Artifacts bucket policy
 resource "aws_s3_bucket_policy" "artifacts" {
   bucket = aws_s3_bucket.artifacts.id
-  
+
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -92,6 +92,22 @@ resource "aws_s3_bucket_policy" "artifacts" {
           "s3:GetObject",
           "s3:GetObjectVersion",
           "s3:PutObject",
+          "s3:ListBucket"
+        ]
+        Resource = [
+          aws_s3_bucket.artifacts.arn,
+          "${aws_s3_bucket.artifacts.arn}/*"
+        ]
+      },
+      {
+        Sid    = "AllowEC2CodeDeployAccess"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::654654447255:role/${local.resource_prefix}-ec2-instance-role"
+        }
+        Action = [
+          "s3:GetObject",
+          "s3:GetObjectVersion",
           "s3:ListBucket"
         ]
         Resource = [

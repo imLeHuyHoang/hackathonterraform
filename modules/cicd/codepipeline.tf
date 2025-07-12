@@ -20,8 +20,8 @@ resource "aws_codepipeline" "win2016" {
 
       configuration = {
         S3Bucket             = var.main_bucket_name
-        S3ObjectKey = "${var.deployment_packages_prefix}windows-server-2016/latest-deployment.zip"
-        PollForSourceChanges = true
+        S3ObjectKey          = "${var.deployment_packages_prefix}windows-server-2016/latest-deployment.zip"
+        PollForSourceChanges = "false"
       }
     }
   }
@@ -29,12 +29,14 @@ resource "aws_codepipeline" "win2016" {
   stage {
     name = "Deploy"
     action {
-      name             = "DeployToEC2"
-      category         = "Deploy"
-      owner            = "AWS"
-      provider         = "CodeDeploy"
-      input_artifacts  = ["source_output"]
-      version          = "1"
+      name            = "DeployToEC2"
+      category        = "Deploy"
+      owner           = "AWS"
+      provider        = "CodeDeploy"
+      input_artifacts = ["source_output"]
+      version         = "1"
+      region          = var.aws_region
+      run_order       = 1
 
       configuration = {
         ApplicationName     = aws_codedeploy_app.windows_patch_app.name
@@ -68,8 +70,8 @@ resource "aws_codepipeline" "win2019" {
 
       configuration = {
         S3Bucket             = var.main_bucket_name
-        S3ObjectKey = "${var.deployment_packages_prefix}windows-server-2019/latest-deployment.zip"
-        PollForSourceChanges = true
+        S3ObjectKey          = "${var.deployment_packages_prefix}windows-server-2019/latest-deployment.zip"
+        PollForSourceChanges = "false"
       }
     }
   }
@@ -77,12 +79,14 @@ resource "aws_codepipeline" "win2019" {
   stage {
     name = "Deploy"
     action {
-      name             = "DeployToEC2"
-      category         = "Deploy"
-      owner            = "AWS"
-      provider         = "CodeDeploy"
-      input_artifacts  = ["source_output"]
-      version          = "1"
+      name            = "DeployToEC2"
+      category        = "Deploy"
+      owner           = "AWS"
+      provider        = "CodeDeploy"
+      input_artifacts = ["source_output"]
+      version         = "1"
+      region          = var.aws_region
+      run_order       = 1
 
       configuration = {
         ApplicationName     = aws_codedeploy_app.windows_patch_app.name
@@ -116,8 +120,8 @@ resource "aws_codepipeline" "win2022" {
 
       configuration = {
         S3Bucket             = var.main_bucket_name
-        S3ObjectKey = "${var.deployment_packages_prefix}windows-server-2022/latest-deployment.zip"
-        PollForSourceChanges = true
+        S3ObjectKey          = "${var.deployment_packages_prefix}windows-server-2022/latest-deployment.zip"
+        PollForSourceChanges = "false"
       }
     }
   }
@@ -125,12 +129,14 @@ resource "aws_codepipeline" "win2022" {
   stage {
     name = "Deploy"
     action {
-      name             = "DeployToEC2"
-      category         = "Deploy"
-      owner            = "AWS"
-      provider         = "CodeDeploy"
-      input_artifacts  = ["source_output"]
-      version          = "1"
+      name            = "DeployToEC2"
+      category        = "Deploy"
+      owner           = "AWS"
+      provider        = "CodeDeploy"
+      input_artifacts = ["source_output"]
+      version         = "1"
+      region          = var.aws_region
+      run_order       = 1
 
       configuration = {
         ApplicationName     = aws_codedeploy_app.windows_patch_app.name

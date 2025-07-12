@@ -29,7 +29,7 @@ variable "lambda_security_group_id" {
 variable "private_subnet_ids" {
   description = "Private subnet IDs for Lambda functions"
   type        = list(string)
-  default     = []  # Empty means Lambda runs outside VPC
+  default     = [] # Empty means Lambda runs outside VPC
 }
 
 # Dependencies from storage module
@@ -133,6 +133,12 @@ variable "public_key_path" {
 variable "key_name" {
   description = "Name for the EC2 key pair on AWS"
   type        = string
+}
+
+variable "aws_region" {
+  description = "AWS region for CodeDeploy agent installation"
+  type        = string
+  default     = "ap-southeast-1"
 }
 
 

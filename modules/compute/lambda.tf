@@ -5,16 +5,16 @@ resource "aws_lambda_function" "data_processor" {
   s3_bucket     = var.lambda_code_bucket_id
   s3_key        = var.lambda_deployment_package_key
   function_name = "${local.resource_prefix}-data-processor"
-  role         = var.lambda_execution_role_arn
-  handler      = "lambda_function.lambda_handler"
-  runtime      = "python3.12"
-  timeout      = 600  # 10 minutes (maximum timeout)
-  memory_size  = 1024
+  role          = var.lambda_execution_role_arn
+  handler       = "lambda_function.lambda_handler"
+  runtime       = "python3.12"
+  timeout       = 600 # 10 minutes (maximum timeout)
+  memory_size   = 1024
   architectures = ["x86_64"]
 
   environment {
     variables = {
-      S3_BUCKET_NAME              = var.main_bucket_id
+      S3_BUCKET_NAME             = var.main_bucket_id
       RAW_DATA_PREFIX            = var.raw_data_prefix
       PROCESSED_DATA_PREFIX      = var.processed_data_prefix
       DEPLOYMENT_PACKAGES_PREFIX = var.deployment_packages_prefix

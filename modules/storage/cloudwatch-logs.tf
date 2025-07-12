@@ -5,7 +5,7 @@
 #   retention_in_days = 14
 #   # Tạm thời bỏ KMS encryption cho CloudWatch Logs
 #   # kms_key_id        = var.kms_key_id
-  
+
 #   tags = merge(local.common_tags, {
 #     Name    = "${local.resource_prefix}-data-processor-logs"
 #     Purpose = "Lambda function logs"
@@ -17,7 +17,7 @@
 #   retention_in_days = 14
 #   # Tạm thời bỏ KMS encryption cho CloudWatch Logs
 #   # kms_key_id        = var.kms_key_id
-  
+
 #   tags = merge(local.common_tags, {
 #     Name    = "${local.resource_prefix}-package-creator-logs"
 #     Purpose = "Lambda function logs"
@@ -29,7 +29,7 @@
 #   retention_in_days = 30
 #   # Tạm thời bỏ KMS encryption cho CloudWatch Logs
 #   # kms_key_id        = var.kms_key_id
-  
+
 #   tags = merge(local.common_tags, {
 #     Name    = "${local.resource_prefix}-s3-access-logs"
 #     Purpose = "S3 access logging"

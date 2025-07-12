@@ -4,12 +4,8 @@ variable "project_name" {
 
 variable "environment" {
   description = "Deployment environment (dev, staging, prod)"
-  type = string
+  type        = string
 }
-
-# variable "main_bucket_id" {
-#   type = string
-# }
 
 variable "deployment_packages_prefix" {
   type = string
@@ -28,12 +24,18 @@ variable "codedeploy_service_role_arn" {
 }
 
 variable "eventbridge_service_role_arn" {
-  description = "ARN of EventBridge IAM Role"
+  description = "ARN of EventBridge service role"
   type        = string
 }
 
 variable "main_bucket_name" {
   type = string
+}
+
+variable "aws_region" {
+  description = "AWS region"
+  type        = string
+  default     = "ap-southeast-1"
 }
 
 

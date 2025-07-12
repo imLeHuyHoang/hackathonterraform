@@ -20,19 +20,6 @@ variable "codepipeline_role_arn" {
   type        = string
 }
 
-# Lambda function dependencies (simplified - only data processor)
-variable "data_processor_lambda_arn" {
-  description = "ARN of the data processor Lambda function"
-  type        = string
-  default     = ""
-}
-
-variable "lambda_permission_for_s3_data_processor" {
-  description = "Lambda permission resource for S3 to invoke data processor"
-  type        = string
-  default     = ""
-}
-
 variable "deployment_packages_prefix" {
   description = "Prefix folder in S3 for deployment packages"
   type        = string
