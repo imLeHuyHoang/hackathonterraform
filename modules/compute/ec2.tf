@@ -18,7 +18,8 @@ resource "aws_instance" "win2016" {
   monitoring                  = false
 
   user_data_base64 = base64encode(templatefile("${path.module}/userdata/install-codedeploy-agent.ps1", {
-    region = var.aws_region
+    region          = var.aws_region
+    windows_version = "2016"
   }))
 
   root_block_device {
@@ -57,7 +58,8 @@ resource "aws_instance" "win2019" {
   monitoring                  = false
 
   user_data_base64 = base64encode(templatefile("${path.module}/userdata/install-codedeploy-agent.ps1", {
-    region = var.aws_region
+    region          = var.aws_region
+    windows_version = "2019"
   }))
 
   root_block_device {
@@ -94,7 +96,8 @@ resource "aws_instance" "win2022" {
   monitoring                  = false
 
   user_data_base64 = base64encode(templatefile("${path.module}/userdata/install-codedeploy-agent.ps1", {
-    region = var.aws_region
+    region          = var.aws_region
+    windows_version = "2022"
   }))
 
   root_block_device {
