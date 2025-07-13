@@ -72,7 +72,7 @@ variable "deployment_packages_prefix" {
 variable "github_repo_url" {
   description = "GitHub repository URL for source code"
   type        = string
-  default     = "https://github.com/imLeHuyHoang/vulnerability-scripts.git"
+  # default     = "https://github.com/imLeHuyHoang/vulnerability-scripts.git"
 }
 
 # Lambda Configuration
@@ -122,11 +122,6 @@ variable "security_group_ids" {
 
 variable "ec2_instance_role_name" {
   description = "IAM role name attached to EC2"
-  type        = string
-}
-
-variable "public_key_path" {
-  description = "Path to your local public key file (.pub)"
   type        = string
 }
 

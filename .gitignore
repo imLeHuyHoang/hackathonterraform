@@ -37,3 +37,10 @@ terraform.rc
 
 my-ec2-key
 my-ec2-key.pub
+
+# Generated Windows keypairs
+windows-keypair.pem
+windows-keypair.pub
+windows-keypair-openssh.key
+*.pem
+*.key

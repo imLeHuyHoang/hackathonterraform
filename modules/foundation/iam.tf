@@ -100,10 +100,10 @@ resource "aws_iam_role_policy_attachment" "ec2_ssm_managed_instance" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
-# CodeDeploy Agent Policy for EC2
+# Enhanced CodeDeploy Agent Policy for EC2 with CloudWatch
 resource "aws_iam_policy" "ec2_codedeploy_agent" {
   name        = "${local.resource_prefix}-ec2-codedeploy-agent-policy"
-  description = "Allows EC2 instances to work with CodeDeploy"
+  description = "Allows EC2 instances to work with CodeDeploy and send logs to CloudWatch"
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -138,6 +138,30 @@ resource "aws_iam_policy" "ec2_codedeploy_agent" {
         Resource = [
           "arn:aws:s3:::aws-codedeploy-*"
         ]
+      },
+      # CloudWatch permissions for logging
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+          "logs:DescribeLogStreams",
+          "logs:DescribeLogGroups"
+        ]
+        Resource = "arn:aws:logs:*:*:*"
+      },
+      # CloudWatch Agent permissions
+      {
+        Effect = "Allow"
+        Action = [
+          "ec2:DescribeVolumes",
+          "ec2:DescribeTags",
+          "cloudwatch:PutMetricData",
+          "cloudwatch:GetMetricStatistics",
+          "cloudwatch:ListMetrics"
+        ]
+        Resource = "*"
       }
     ]
   })
@@ -148,6 +172,12 @@ resource "aws_iam_policy" "ec2_codedeploy_agent" {
 resource "aws_iam_role_policy_attachment" "ec2_codedeploy_agent" {
   role       = aws_iam_role.ec2_instance.name
   policy_arn = aws_iam_policy.ec2_codedeploy_agent.arn
+}
+
+# Add CloudWatch Agent policy attachment
+resource "aws_iam_role_policy_attachment" "ec2_cloudwatch_agent" {
+  role       = aws_iam_role.ec2_instance.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
 }
 
 # CodePipeline Service Role

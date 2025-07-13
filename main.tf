@@ -37,7 +37,28 @@ module "storage" {
   depends_on = [module.foundation]
 }
 
-# Compute Layer - Lambda Functions
+# CICD - Tạo trước để có CloudWatch Log Groups
+module "cicd" {
+  source = "./modules/cicd"
+
+  project_name = var.project_name
+  environment  = var.environment
+  aws_region   = var.aws_region
+
+  # S3 buckets
+  main_bucket_name           = module.storage.main_bucket_id
+  artifacts_bucket_id        = module.storage.artifacts_bucket_id
+  deployment_packages_prefix = var.deployment_packages_prefix
+
+  # IAM Roles
+  codepipeline_service_role_arn = module.foundation.codepipeline_service_role_arn
+  codedeploy_service_role_arn   = module.foundation.codedeploy_service_role_arn
+  eventbridge_service_role_arn  = module.foundation.eventbridge_service_role_arn
+
+  depends_on = [module.foundation, module.storage]
+}
+
+# Compute Layer - Lambda Functions (phụ thuộc vào CICD để có log groups)
 module "compute" {
   source = "./modules/compute"
 
@@ -65,10 +86,9 @@ module "compute" {
   subnet_id              = module.foundation.public_subnet_ids[0]
   security_group_ids     = [module.foundation.ec2_windows_security_group_id]
   key_name               = var.key_name
-  public_key_path        = "${path.root}/my-ec2-key.pub"
   ec2_instance_role_name = module.foundation.ec2_instance_role_name
 
-  depends_on = [module.foundation, module.storage]
+  depends_on = [module.foundation, module.storage, module.cicd]
 }
 
 # Khôi phục S3 bucket notification ở main.tf
@@ -89,27 +109,6 @@ resource "aws_s3_bucket_notification" "main_bucket_notification" {
   depends_on = [
     module.compute.lambda_permission_for_s3_data_processor
   ]
-}
-
-# CICD
-module "cicd" {
-  source = "./modules/cicd"
-
-  project_name = var.project_name
-  environment  = var.environment
-  aws_region   = var.aws_region
-
-  # S3 buckets
-  main_bucket_name           = module.storage.main_bucket_id
-  artifacts_bucket_id        = module.storage.artifacts_bucket_id
-  deployment_packages_prefix = var.deployment_packages_prefix
-
-  # IAM Roles
-  codepipeline_service_role_arn = module.foundation.codepipeline_service_role_arn
-  codedeploy_service_role_arn   = module.foundation.codedeploy_service_role_arn
-  eventbridge_service_role_arn  = module.foundation.eventbridge_service_role_arn
-
-  depends_on = [module.foundation, module.storage, module.compute]
 }
 
 

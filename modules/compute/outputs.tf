@@ -70,3 +70,35 @@ output "win2022_private_ip" {
   description = "Private IP of Windows Server 2022"
   value       = aws_instance.win2022.private_ip
 }
+
+# Key Pair Outputs
+output "key_pair_name" {
+  description = "Name of the generated EC2 key pair"
+  value       = aws_key_pair.ec2_key.key_name
+}
+
+output "key_pair_fingerprint" {
+  description = "Fingerprint of the generated key pair"
+  value       = aws_key_pair.ec2_key.fingerprint
+}
+
+output "private_key_filename" {
+  description = "Path to the generated private key file"
+  value       = local_file.private_key.filename
+}
+
+output "public_key_filename" {
+  description = "Path to the generated public key file"
+  value       = local_file.public_key.filename
+}
+
+# Windows Password Decryption Info
+output "windows_password_data" {
+  description = "Windows password data for all instances (encrypted)"
+  value = {
+    win2016 = aws_instance.win2016.password_data
+    win2019 = aws_instance.win2019.password_data
+    win2022 = aws_instance.win2022.password_data
+  }
+  sensitive = true
+}
