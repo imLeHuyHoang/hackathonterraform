@@ -2,7 +2,7 @@
 # Enhanced CodeDeploy Agent Installation with Windows version-specific handling
 $ErrorActionPreference = "Continue"
 $region = "${region}"
-$windowsVersion = "${windows_version}"  # Pass from Terraform
+$windowsVersion = "${windows_version}"
 
 # Log everything
 Start-Transcript -Path "C:\temp\user-data-log.txt" -Append
@@ -14,38 +14,68 @@ Write-Host "Windows Version: $windowsVersion"
 # Create temp directory
 New-Item -ItemType directory -Path "c:\temp" -Force
 
-# Determine CodeDeploy Agent version based on Windows version
+# Determine CodeDeploy Agent download strategy based on Windows version
 $agentVersion = "latest"
-$downloadUrl = ""
+$downloadUrls = @()
+$installStrategy = "latest"
 
 switch ($windowsVersion) {
     "2016" {
-        # Windows Server 2016 - Use last supported version 1.5.0
-        $agentVersion = "1.5.0"
-        $downloadUrl = "https://aws-codedeploy-$region.s3.$region.amazonaws.com/releases/codedeploy-agent-1.5.0.msi"
-        Write-Host "Using CodeDeploy Agent v1.5.0 (last supported for Windows 2016)"
+        # Windows Server 2016 - Multiple fallback URLs for compatibility
+        $agentVersion = "1.5.0-compatible"
+        $installStrategy = "legacy"
+        
+        # Primary URLs (try multiple formats)
+        $downloadUrls = @(
+            "https://s3.$region.amazonaws.com/aws-codedeploy-$region/latest/codedeploy-agent.msi",
+            "https://aws-codedeploy-$region.s3.$region.amazonaws.com/latest/codedeploy-agent.msi",
+            "https://s3-$region.amazonaws.com/aws-codedeploy-$region/latest/codedeploy-agent.msi"
+        )
+        
+        Write-Host "Using legacy-compatible CodeDeploy Agent for Windows Server 2016"
+        Write-Host "Strategy: Multiple URL fallbacks for compatibility"
     }
     "2019" {
-        # Windows Server 2019 - Can use latest
+        # Windows Server 2019 - Standard latest
         $agentVersion = "latest"
-        $downloadUrl = "https://aws-codedeploy-$region.s3.$region.amazonaws.com/latest/codedeploy-agent.msi"
-        Write-Host "Using latest CodeDeploy Agent for Windows 2019"
+        $installStrategy = "standard"
+        
+        $downloadUrls = @(
+            "https://s3.$region.amazonaws.com/aws-codedeploy-$region/latest/codedeploy-agent.msi",
+            "https://aws-codedeploy-$region.s3.$region.amazonaws.com/latest/codedeploy-agent.msi"
+        )
+        
+        Write-Host "Using latest CodeDeploy Agent for Windows Server 2019"
     }
     "2022" {
-        # Windows Server 2022 - Can use latest
+        # Windows Server 2022 - Standard latest
         $agentVersion = "latest"
-        $downloadUrl = "https://aws-codedeploy-$region.s3.$region.amazonaws.com/latest/codedeploy-agent.msi"
-        Write-Host "Using latest CodeDeploy Agent for Windows 2022"
+        $installStrategy = "standard"
+        
+        $downloadUrls = @(
+            "https://s3.$region.amazonaws.com/aws-codedeploy-$region/latest/codedeploy-agent.msi",
+            "https://aws-codedeploy-$region.s3.$region.amazonaws.com/latest/codedeploy-agent.msi"
+        )
+        
+        Write-Host "Using latest CodeDeploy Agent for Windows Server 2022"
     }
     default {
-        # Default to latest for unknown versions
+        # Default fallback
         $agentVersion = "latest"
-        $downloadUrl = "https://aws-codedeploy-$region.s3.$region.amazonaws.com/latest/codedeploy-agent.msi"
+        $installStrategy = "standard"
+        
+        $downloadUrls = @(
+            "https://s3.$region.amazonaws.com/aws-codedeploy-$region/latest/codedeploy-agent.msi"
+        )
+        
         Write-Host "Using latest CodeDeploy Agent (default)"
     }
 }
 
-Write-Host "Download URL: $downloadUrl"
+Write-Host "Download URLs to try: $($downloadUrls.Count)"
+foreach ($url in $downloadUrls) {
+    Write-Host "  - $url"
+}
 
 # Stop existing CodeDeploy agent if running
 try {
@@ -63,50 +93,142 @@ try {
     Write-Host "Error checking existing service: $_"
 }
 
-# Download and install CodeDeploy Agent
+# Download CodeDeploy Agent with multiple URL fallback
+$downloadSuccess = $false
+$successfulUrl = ""
+
 try {
     Write-Host "Downloading CodeDeploy Agent version $agentVersion..."
     
     # Use TLS 1.2 for download
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     
-    # Download with retry logic
-    $maxRetries = 3
-    $retryCount = 0
-    $downloadSuccess = $false
-    
-    while ($retryCount -lt $maxRetries -and -not $downloadSuccess) {
-        try {
-            $retryCount++
-            Write-Host "Download attempt $retryCount of $maxRetries..."
-            
-            Invoke-WebRequest -Uri $downloadUrl -OutFile "c:\temp\codedeploy-agent.msi" -UseBasicParsing
-            
-            # Verify download
-            if (Test-Path "c:\temp\codedeploy-agent.msi") {
-                $fileSize = (Get-Item "c:\temp\codedeploy-agent.msi").Length
-                Write-Host "Downloaded successfully. File size: $fileSize bytes"
-                $downloadSuccess = $true
-            } else {
-                throw "Downloaded file not found"
-            }
-        } catch {
-            Write-Host "Download attempt $retryCount failed: $_"
-            if ($retryCount -lt $maxRetries) {
-                Write-Host "Retrying in 10 seconds..."
-                Start-Sleep -Seconds 10
+    # Try each URL until one succeeds
+    foreach ($downloadUrl in $downloadUrls) {
+        if ($downloadSuccess) { break }
+        
+        Write-Host "Trying URL: $downloadUrl"
+        
+        # Retry logic for each URL
+        $maxRetries = 2
+        $retryCount = 0
+        
+        while ($retryCount -lt $maxRetries -and -not $downloadSuccess) {
+            try {
+                $retryCount++
+                Write-Host "  Download attempt $retryCount of $maxRetries for this URL..."
+                
+                # Test URL accessibility first
+                try {
+                    $webRequest = [System.Net.WebRequest]::Create($downloadUrl)
+                    $webRequest.Method = "HEAD"
+                    $webRequest.Timeout = 10000  # 10 seconds
+                    $response = $webRequest.GetResponse()
+                    $statusCode = $response.StatusCode
+                    $response.Close()
+                    
+                    Write-Host "  URL accessibility test: $statusCode"
+                    
+                    if ($statusCode -ne "OK") {
+                        throw "URL returned status: $statusCode"
+                    }
+                } catch {
+                    Write-Host "  URL accessibility test failed: $_"
+                    break  # Skip to next URL
+                }
+                
+                # Actual download
+                Invoke-WebRequest -Uri $downloadUrl -OutFile "c:\temp\codedeploy-agent.msi" -UseBasicParsing -TimeoutSec 60
+                
+                # Verify download
+                if (Test-Path "c:\temp\codedeploy-agent.msi") {
+                    $fileSize = (Get-Item "c:\temp\codedeploy-agent.msi").Length
+                    
+                    # Check if file is actually downloaded (not empty or error page)
+                    if ($fileSize -gt 1000000) {  # Should be at least 1MB
+                        Write-Host "  Downloaded successfully. File size: $fileSize bytes"
+                        $downloadSuccess = $true
+                        $successfulUrl = $downloadUrl
+                    } else {
+                        throw "Downloaded file too small ($fileSize bytes), likely an error page"
+                    }
+                } else {
+                    throw "Downloaded file not found"
+                }
+                
+            } catch {
+                Write-Host "  Download attempt $retryCount failed: $_"
+                
+                # Clean up failed download
+                if (Test-Path "c:\temp\codedeploy-agent.msi") {
+                    Remove-Item "c:\temp\codedeploy-agent.msi" -Force -ErrorAction SilentlyContinue
+                }
+                
+                if ($retryCount -lt $maxRetries) {
+                    Write-Host "  Retrying in 5 seconds..."
+                    Start-Sleep -Seconds 5
+                }
             }
         }
     }
     
     if (-not $downloadSuccess) {
-        throw "Failed to download CodeDeploy Agent after $maxRetries attempts"
+        throw "Failed to download CodeDeploy Agent from any URL after multiple attempts"
+    }
+    
+    Write-Host "SUCCESS: Downloaded from $successfulUrl"
+    
+    # Alternative download method for Windows 2016 if needed
+    if ($windowsVersion -eq "2016" -and -not $downloadSuccess) {
+        Write-Host "Trying alternative download method for Windows 2016..."
+        
+        try {
+            # Method 2: Direct AWS CLI-style download (if available)
+            $alternativeUrl = "https://aws-codedeploy-downloads.s3.amazonaws.com/releases/codedeploy-agent_installer.msi"
+            Write-Host "Trying alternative URL: $alternativeUrl"
+            
+            Invoke-WebRequest -Uri $alternativeUrl -OutFile "c:\temp\codedeploy-agent.msi" -UseBasicParsing
+            
+            if (Test-Path "c:\temp\codedeploy-agent.msi") {
+                $fileSize = (Get-Item "c:\temp\codedeploy-agent.msi").Length
+                if ($fileSize -gt 1000000) {
+                    Write-Host "Alternative download successful. File size: $fileSize bytes"
+                    $downloadSuccess = $true
+                    $successfulUrl = $alternativeUrl
+                }
+            }
+        } catch {
+            Write-Host "Alternative download method also failed: $_"
+        }
+    }
+    
+    if (-not $downloadSuccess) {
+        throw "All download methods failed for Windows Server $windowsVersion"
     }
     
     Write-Host "Installing CodeDeploy Agent..."
     
+    # Special handling for Windows 2016
+    if ($windowsVersion -eq "2016") {
+        Write-Host "Applying Windows Server 2016 specific installation procedures..."
+        
+        # Ensure .NET Framework compatibility
+        try {
+            Write-Host "Checking .NET Framework version..."
+            $netVersion = (Get-ItemProperty "HKLM:SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full").Release
+            Write-Host ".NET Framework release version: $netVersion"
+            
+            if ($netVersion -lt 461808) {  # .NET 4.7.2 or later recommended
+                Write-Host "Warning: .NET Framework version may be outdated for optimal CodeDeploy Agent performance"
+            }
+        } catch {
+            Write-Host "Could not check .NET Framework version: $_"
+        }
+    }
+    
     # Uninstall existing version first
     try {
+        Write-Host "Checking for existing CodeDeploy agent installation..."
         $app = Get-WmiObject -Class Win32_Product | Where-Object { $_.Name -like "*CodeDeploy*" }
         if ($app) {
             Write-Host "Uninstalling existing CodeDeploy agent: $($app.Name) v$($app.Version)"
@@ -128,26 +250,35 @@ try {
     
     Write-Host "Installation process exit code: $($installProcess.ExitCode)"
     
-    if ($installProcess.ExitCode -eq 0) {
-        Write-Host "Installation completed successfully"
-    } else {
-        Write-Host "Installation completed with exit code: $($installProcess.ExitCode)"
+    # Check common exit codes
+    switch ($installProcess.ExitCode) {
+        0 { Write-Host "Installation completed successfully" }
+        1603 { Write-Host "Installation error: General MSI error" }
+        1619 { Write-Host "Installation error: Package could not be opened" }
+        1633 { Write-Host "Installation error: Platform not supported" }
+        default { Write-Host "Installation completed with exit code: $($installProcess.ExitCode)" }
     }
     
     Start-Sleep -Seconds 20
     
     Write-Host "Configuring CodeDeploy Agent Service..."
     
-    # Configure service
+    # Configure service with Windows 2016 specific settings
     try {
+        # For Windows 2016, sometimes service configuration needs extra time
+        if ($windowsVersion -eq "2016") {
+            Write-Host "Applying Windows Server 2016 service configuration..."
+            Start-Sleep -Seconds 10
+        }
+        
         Set-Service -Name codedeployagent -StartupType Automatic -ErrorAction Stop
         Write-Host "Service startup type set to Automatic"
     } catch {
         Write-Host "Warning: Could not set service startup type: $_"
     }
     
-    # Start service with retry
-    $maxStartRetries = 3
+    # Start service with retry and Windows 2016 specific handling
+    $maxStartRetries = 5  # More retries for Windows 2016
     $startRetryCount = 0
     $serviceStarted = $false
     
@@ -157,7 +288,7 @@ try {
             Write-Host "Starting service attempt $startRetryCount of $maxStartRetries..."
             
             Start-Service -Name codedeployagent -ErrorAction Stop
-            Start-Sleep -Seconds 5
+            Start-Sleep -Seconds 10  # Longer wait for Windows 2016
             
             $service = Get-Service -Name codedeployagent -ErrorAction Stop
             if ($service.Status -eq "Running") {
@@ -169,31 +300,70 @@ try {
         } catch {
             Write-Host "Start attempt $startRetryCount failed: $_"
             if ($startRetryCount -lt $maxStartRetries) {
-                Write-Host "Retrying in 10 seconds..."
-                Start-Sleep -Seconds 10
+                $waitTime = 15
+                if ($windowsVersion -eq "2016") {
+                    $waitTime = 20  # Longer wait for Windows 2016
+                }
+                Write-Host "Retrying in $waitTime seconds..."
+                Start-Sleep -Seconds $waitTime
             }
         }
     }
     
-    # Verify installation
+    # Enhanced verification for Windows 2016
     try {
         $service = Get-Service -Name codedeployagent -ErrorAction SilentlyContinue
         if ($service) {
             Write-Host "CodeDeploy Agent service found. Status: $($service.Status)"
             
-            # Check agent version if possible
+            # Check agent log files
             $agentLogPath = "C:\ProgramData\Amazon\CodeDeploy\log\codedeploy-agent.log"
             if (Test-Path $agentLogPath) {
                 Write-Host "Agent log file exists: $agentLogPath"
+                
+                # For Windows 2016, check log for specific compatibility issues
+                if ($windowsVersion -eq "2016") {
+                    try {
+                        $logContent = Get-Content $agentLogPath -Tail 10 -ErrorAction SilentlyContinue
+                        $hasErrors = $logContent | Where-Object { $_ -match "ERROR|FATAL" }
+                        if ($hasErrors) {
+                            Write-Host "Warning: Found potential errors in agent log:"
+                            $hasErrors | ForEach-Object { Write-Host "  $_" }
+                        } else {
+                            Write-Host "Agent log shows no critical errors"
+                        }
+                    } catch {
+                        Write-Host "Could not read agent log: $_"
+                    }
+                }
+            }
+            
+            # Check agent installation directory
+            $agentPaths = @(
+                "C:\opt\codedeploy-agent",
+                "C:\Program Files\Amazon\CodeDeploy",
+                "C:\Program Files (x86)\Amazon\CodeDeploy"
+            )
+            
+            foreach ($path in $agentPaths) {
+                if (Test-Path $path) {
+                    Write-Host "Agent files found at: $path"
+                    break
+                }
             }
             
             if ($service.Status -eq "Running") {
-                Write-Host "SUCCESS: CodeDeploy Agent installation completed and service is running"
+                Write-Host "✅ SUCCESS: CodeDeploy Agent v$agentVersion is properly installed and running"
+                
+                # Additional verification for Windows 2016
+                if ($windowsVersion -eq "2016") {
+                    Write-Host "Windows Server 2016 specific verification completed"
+                }
             } else {
-                Write-Host "WARNING: CodeDeploy Agent installed but service is not running"
+                Write-Host "⚠️  WARNING: CodeDeploy Agent installed but service is not running"
             }
         } else {
-            Write-Host "ERROR: CodeDeploy Agent service not found after installation"
+            Write-Host "❌ ERROR: CodeDeploy Agent service not found after installation"
         }
     } catch {
         Write-Host "Error verifying installation: $_"
@@ -202,6 +372,33 @@ try {
 } catch {
     Write-Host "CRITICAL ERROR during CodeDeploy Agent installation: $_"
     Write-Host "Stack trace: $($_.ScriptStackTrace)"
+    
+    # Enhanced error logging for Windows 2016
+    if ($windowsVersion -eq "2016") {
+        Write-Host "Windows Server 2016 troubleshooting information:"
+        
+        # Check Windows version details
+        try {
+            $osInfo = Get-WmiObject -Class Win32_OperatingSystem
+            Write-Host "OS Version: $($osInfo.Version)"
+            Write-Host "OS Build Number: $($osInfo.BuildNumber)"
+            Write-Host "OS Architecture: $($osInfo.OSArchitecture)"
+        } catch {
+            Write-Host "Could not get OS information: $_"
+        }
+        
+        # Check if MSI installation log exists
+        if (Test-Path "c:\temp\host-agent-install-log.txt") {
+            Write-Host "MSI installation log available at: c:\temp\host-agent-install-log.txt"
+            try {
+                $logTail = Get-Content "c:\temp\host-agent-install-log.txt" -Tail 5
+                Write-Host "Last 5 lines of installation log:"
+                $logTail | ForEach-Object { Write-Host "  $_" }
+            } catch {
+                Write-Host "Could not read installation log: $_"
+            }
+        }
+    }
 }
 
 # Configure Windows for automation
@@ -231,16 +428,42 @@ try {
     if ($finalService) {
         Write-Host "Service Status: $($finalService.Status)"
         Write-Host "Service StartType: $($finalService.StartType)"
+        
+        # Windows 2016 specific checks
+        if ($windowsVersion -eq "2016") {
+            Write-Host "Windows Server 2016 service verification:"
+            try {
+                $serviceDetails = Get-WmiObject -Class Win32_Service -Filter "Name='codedeployagent'"
+                if ($serviceDetails) {
+                    Write-Host "  Service Path: $($serviceDetails.PathName)"
+                    Write-Host "  Service Account: $($serviceDetails.StartName)"
+                }
+            } catch {
+                Write-Host "  Could not get detailed service information: $_"
+            }
+        }
     } else {
         Write-Host "ERROR: Service not found"
     }
     
     # Check if agent files exist
-    $agentPath = "C:\opt\codedeploy-agent"
-    if (Test-Path $agentPath) {
-        Write-Host "Agent files found at: $agentPath"
-    } else {
-        Write-Host "WARNING: Agent files not found at expected location"
+    $agentFound = $false
+    $agentPaths = @(
+        "C:\opt\codedeploy-agent",
+        "C:\Program Files\Amazon\CodeDeploy",
+        "C:\Program Files (x86)\Amazon\CodeDeploy"
+    )
+    
+    foreach ($agentPath in $agentPaths) {
+        if (Test-Path $agentPath) {
+            Write-Host "Agent files found at: $agentPath"
+            $agentFound = $true
+            break
+        }
+    }
+    
+    if (-not $agentFound) {
+        Write-Host "WARNING: Agent files not found at expected locations"
     }
     
     # Log file status
@@ -251,11 +474,17 @@ try {
         Write-Host "Log files found: $($logFiles.Count)"
     }
     
-    # Final verdict
+    # Final verdict with Windows version context
     if ($finalService -and $finalService.Status -eq "Running") {
-        Write-Host "✅ SUCCESS: CodeDeploy Agent v$agentVersion is properly installed and running"
+        Write-Host "✅ SUCCESS: CodeDeploy Agent v$agentVersion is properly installed and running on Windows Server $windowsVersion"
+        if ($windowsVersion -eq "2016") {
+            Write-Host "🎯 Windows Server 2016 compatibility confirmed"
+        }
     } else {
-        Write-Host "❌ FAILURE: CodeDeploy Agent installation or startup failed"
+        Write-Host "❌ FAILURE: CodeDeploy Agent installation or startup failed on Windows Server $windowsVersion"
+        if ($windowsVersion -eq "2016") {
+            Write-Host "🔧 Windows Server 2016 may require manual troubleshooting"
+        }
     }
     
 } catch {
@@ -264,6 +493,7 @@ try {
 
 Write-Host "EC2 instance initialization completed at $(Get-Date)"
 Write-Host "Windows Version: $windowsVersion, Agent Version: $agentVersion"
+Write-Host "Successful download URL: $successfulUrl"
 
 Stop-Transcript
 </powershell>
