@@ -39,7 +39,7 @@ variable "public_subnets" {
 variable "instance_type" {
   description = "EC2 instance type"
   type        = string
-  default     = "t3.medium"
+  default     = "m7i.xlarge"
 }
 
 # S3 Configuration
