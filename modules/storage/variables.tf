@@ -25,3 +25,9 @@ variable "deployment_packages_prefix" {
   type        = string
   default     = "deployment-packages/"
 }
+
+variable "logs_prefix" {
+  description = "Prefix folder in S3 for server logs"
+  type        = string
+  default     = "logs/"
+}

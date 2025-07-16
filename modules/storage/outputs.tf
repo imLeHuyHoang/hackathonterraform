@@ -59,6 +59,27 @@ output "deployment_packages_prefix" {
   value       = "deployment-packages/"
 }
 
+# Logs prefix outputs
+output "logs_prefix" {
+  description = "S3 prefix for server logs"
+  value       = "logs/"
+}
+
+output "logs_win2016_prefix" {
+  description = "S3 prefix for Windows Server 2016 logs"
+  value       = "logs/windows-server-2016/"
+}
+
+output "logs_win2019_prefix" {
+  description = "S3 prefix for Windows Server 2019 logs"
+  value       = "logs/windows-server-2019/"
+}
+
+output "logs_win2022_prefix" {
+  description = "S3 prefix for Windows Server 2022 logs"
+  value       = "logs/windows-server-2022/"
+}
+
 # All bucket ARNs for monitoring
 output "all_bucket_arns" {
   description = "List of all S3 bucket ARNs"

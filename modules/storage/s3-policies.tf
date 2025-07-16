@@ -54,6 +54,38 @@ resource "aws_s3_bucket_policy" "main" {
           aws_s3_bucket.main.arn,
           "${aws_s3_bucket.main.arn}/deployment-packages/*"
         ]
+      },
+      {
+        Sid    = "AllowEC2LogsListBucket"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::654654447255:role/${local.resource_prefix}-ec2-instance-role"
+        }
+        Action = [
+          "s3:ListBucket"
+        ]
+        Resource = aws_s3_bucket.main.arn
+        Condition = {
+          StringLike = {
+            "s3:prefix" = [
+              "logs/*"
+            ]
+          }
+        }
+      },
+      {
+        Sid    = "AllowEC2LogsPutGetObject"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::654654447255:role/${local.resource_prefix}-ec2-instance-role"
+        }
+        Action = [
+          "s3:PutObject",
+          "s3:PutObjectAcl",
+          "s3:GetObject",
+          "s3:GetObjectVersion"
+        ]
+        Resource = "${aws_s3_bucket.main.arn}/logs/*"
       }
     ]
   })

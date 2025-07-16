@@ -107,7 +107,7 @@ variable "win2022_ami_id" {
 variable "ec2_instance_type" {
   description = "EC2 Instance Type"
   type        = string
-  default     = "m7i.xlarge"
+  default     = "c6in.large"
 }
 
 variable "subnet_id" {

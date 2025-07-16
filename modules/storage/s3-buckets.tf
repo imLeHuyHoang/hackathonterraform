@@ -94,6 +94,74 @@ resource "aws_s3_object" "deployment_packages_folder" {
   ]
 }
 
+# Log folder and subfolders for each Windows Server version
+resource "aws_s3_object" "logs_folder" {
+  bucket = aws_s3_bucket.main.id
+  key    = "logs/"
+
+  tags = merge(local.common_tags, {
+    Purpose = "Server deployment and patching logs"
+  })
+
+  depends_on = [
+    aws_s3_bucket.main,
+    aws_s3_bucket_versioning.main,
+    aws_s3_bucket_server_side_encryption_configuration.main,
+    aws_s3_bucket_public_access_block.main
+  ]
+}
+
+resource "aws_s3_object" "logs_win2016_folder" {
+  bucket = aws_s3_bucket.main.id
+  key    = "logs/windows-server-2016/"
+
+  tags = merge(local.common_tags, {
+    Purpose = "Windows Server 2016 deployment and patching logs"
+    ServerVersion = "2016"
+  })
+
+  depends_on = [
+    aws_s3_bucket.main,
+    aws_s3_bucket_versioning.main,
+    aws_s3_bucket_server_side_encryption_configuration.main,
+    aws_s3_bucket_public_access_block.main
+  ]
+}
+
+resource "aws_s3_object" "logs_win2019_folder" {
+  bucket = aws_s3_bucket.main.id
+  key    = "logs/windows-server-2019/"
+
+  tags = merge(local.common_tags, {
+    Purpose = "Windows Server 2019 deployment and patching logs"
+    ServerVersion = "2019"
+  })
+
+  depends_on = [
+    aws_s3_bucket.main,
+    aws_s3_bucket_versioning.main,
+    aws_s3_bucket_server_side_encryption_configuration.main,
+    aws_s3_bucket_public_access_block.main
+  ]
+}
+
+resource "aws_s3_object" "logs_win2022_folder" {
+  bucket = aws_s3_bucket.main.id
+  key    = "logs/windows-server-2022/"
+
+  tags = merge(local.common_tags, {
+    Purpose = "Windows Server 2022 deployment and patching logs"
+    ServerVersion = "2022"
+  })
+
+  depends_on = [
+    aws_s3_bucket.main,
+    aws_s3_bucket_versioning.main,
+    aws_s3_bucket_server_side_encryption_configuration.main,
+    aws_s3_bucket_public_access_block.main
+  ]
+}
+
 # Lambda Function Code Bucket
 resource "aws_s3_bucket" "lambda_code" {
   bucket = "${local.resource_prefix}-lambda-code"

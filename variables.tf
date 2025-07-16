@@ -39,7 +39,7 @@ variable "public_subnets" {
 variable "instance_type" {
   description = "EC2 instance type"
   type        = string
-  default     = "m7i.xlarge"
+  default     = "c6in.large"
 }
 
 # S3 Configuration
@@ -59,6 +59,12 @@ variable "deployment_packages_prefix" {
   description = "S3 prefix for deployment packages"
   type        = string
   default     = "deployment-packages/"
+}
+
+variable "logs_prefix" {
+  description = "S3 prefix for server logs"
+  type        = string
+  default     = "logs/"
 }
 
 # GitHub Configuration
