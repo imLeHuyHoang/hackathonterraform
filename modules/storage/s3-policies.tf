@@ -58,9 +58,7 @@ resource "aws_s3_bucket_policy" "main" {
       {
         Sid    = "AllowEC2LogsListBucket"
         Effect = "Allow"
-        Principal = {
-          AWS = "arn:aws:iam::654654447255:role/${local.resource_prefix}-ec2-instance-role"
-        }
+        Principal = "*"
         Action = [
           "s3:ListBucket"
         ]
@@ -76,9 +74,8 @@ resource "aws_s3_bucket_policy" "main" {
       {
         Sid    = "AllowEC2LogsPutGetObject"
         Effect = "Allow"
-        Principal = {
-          AWS = "arn:aws:iam::654654447255:role/${local.resource_prefix}-ec2-instance-role"
-        }
+        Principal = "*"
+        
         Action = [
           "s3:PutObject",
           "s3:PutObjectAcl",
@@ -134,9 +131,7 @@ resource "aws_s3_bucket_policy" "artifacts" {
       {
         Sid    = "AllowEC2CodeDeployAccess"
         Effect = "Allow"
-        Principal = {
-          AWS = "arn:aws:iam::654654447255:role/${local.resource_prefix}-ec2-instance-role"
-        }
+        Principal = "*"
         Action = [
           "s3:GetObject",
           "s3:GetObjectVersion",

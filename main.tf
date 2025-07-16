@@ -87,6 +87,7 @@ module "compute" {
   security_group_ids     = [module.foundation.ec2_windows_security_group_id]
   key_name               = var.key_name
   ec2_instance_role_name = module.foundation.ec2_instance_role_name
+  ec2_instance_type      = var.ec2_instance_type
 
   depends_on = [module.foundation, module.storage, module.cicd]
 }

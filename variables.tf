@@ -9,7 +9,6 @@ variable "aws_region" {
 variable "project_name" {
   description = "Name of the project"
   type        = string
-  default     = "vulnerability-patching"
 }
 
 variable "environment" {
@@ -40,6 +39,11 @@ variable "instance_type" {
   description = "EC2 instance type"
   type        = string
   default     = "c6in.large"
+}
+
+variable "ec2_instance_type" {
+  description = "EC2 Instance Type"
+  type        = string
 }
 
 # S3 Configuration
