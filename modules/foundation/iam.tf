@@ -162,18 +162,7 @@ resource "aws_iam_policy" "ec2_codedeploy_agent" {
           "cloudwatch:ListMetrics"
         ]
         Resource = "*"
-      },
-      {
-        Effect = "Allow",
-        Action = [
-          "ec2:DescribeInstances",
-          "ec2:DescribeVolumes",
-          "ec2:CreateSnapshot",
-          "ec2:CreateTags",
-          "ec2:ModifyInstanceMetadataOptions"
-        ]
-        Resource = "*"
-       }
+      }
     ]
   })
 
