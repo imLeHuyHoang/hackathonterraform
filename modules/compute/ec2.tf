@@ -1,5 +1,5 @@
 # =============================================================================
-# Tạo các máy chủ Windows Server (2016, 2019, 2022) cho việc patching CVE
+# Windows Server (2016, 2019, 2022)
 # Mỗi server sẽ được cài sẵn CodeDeploy Agent để nhận deployment từ CodePipeline
 # =============================================================================
 resource "aws_instance" "win2016" {
@@ -28,7 +28,6 @@ resource "aws_instance" "win2016" {
     delete_on_termination = true
     encrypted             = false
 
-    # 🏷️ Tags cho ổ cứng
     tags = merge(local.common_tags, {
       Name = "${var.environment}-win2016-root"
     })
@@ -116,7 +115,7 @@ resource "aws_instance" "win2022" {
     Patch            = "Windows Server 2022"
     Environment      = var.environment
     WindowsVersion   = "2022"
-    DeploymentTarget = "win2022" # 🎯 CodeDeploy targeting
+    DeploymentTarget = "win2022"
   })
 }
 

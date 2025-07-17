@@ -1,11 +1,8 @@
-# Foundation Module - VPC Configuration (Default-like setup)
-
-# Get current region's AZs
 data "aws_availability_zones" "available" {
   state = "available"
 }
 
-# VPC with default-like configuration
+# VPC
 resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr
   enable_dns_support   = true
@@ -16,7 +13,7 @@ resource "aws_vpc" "main" {
   })
 }
 
-# Public Subnets (like default VPC - all public)
+# Public Subnets
 resource "aws_subnet" "public" {
   count                   = length(var.public_subnets)
   vpc_id                  = aws_vpc.main.id
@@ -30,7 +27,7 @@ resource "aws_subnet" "public" {
   })
 }
 
-# Internet Gateway (essential for default-like behavior)
+# Internet Gateway
 resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
 
@@ -39,7 +36,7 @@ resource "aws_internet_gateway" "main" {
   })
 }
 
-# Default Route Table (modify existing one like default VPC)
+# Default Route Table
 resource "aws_default_route_table" "main" {
   default_route_table_id = aws_vpc.main.default_route_table_id
 
@@ -52,20 +49,15 @@ resource "aws_default_route_table" "main" {
     Name = "${local.resource_prefix}-default-rt"
   })
 }
-
-# Default Security Group (modify existing one)
 resource "aws_default_security_group" "main" {
   vpc_id = aws_vpc.main.id
 
-  # Default inbound rules
   ingress {
     from_port = 0
     to_port   = 0
     protocol  = "-1"
     self      = true
   }
-
-  # Default outbound rules (allow all)
   egress {
     from_port   = 0
     to_port     = 0
@@ -78,7 +70,6 @@ resource "aws_default_security_group" "main" {
   })
 }
 
-# Additional Security Groups for specific services
 resource "aws_security_group" "ec2_windows" {
   name        = "${local.resource_prefix}-ec2-windows-sg"
   description = "Security group for Windows EC2 instances"
@@ -133,7 +124,6 @@ resource "aws_security_group" "lambda" {
   description = "Security group for Lambda functions"
   vpc_id      = aws_vpc.main.id
 
-  # Only outbound access needed
   egress {
     from_port   = 0
     to_port     = 0
