@@ -1,5 +1,3 @@
-# Compute Module - Lambda Functions
-
 # Data Processor Lambda Function
 resource "aws_lambda_function" "data_processor" {
   s3_bucket     = var.lambda_code_bucket_id

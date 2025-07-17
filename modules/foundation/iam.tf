@@ -208,8 +208,6 @@ resource "aws_iam_role" "codepipeline_service" {
 
   tags = local.common_tags
 }
-
-# CodePipeline Service Policy
 resource "aws_iam_policy" "codepipeline_service" {
   name        = "${local.resource_prefix}-codepipeline-service-policy"
   description = "Policy for CodePipeline service role"
@@ -254,7 +252,6 @@ resource "aws_iam_role_policy_attachment" "codepipeline_service" {
   policy_arn = aws_iam_policy.codepipeline_service.arn
 }
 
-# CodeDeploy Service Role
 resource "aws_iam_role" "codedeploy_service" {
   name = "${local.resource_prefix}-codedeploy-service-role"
 
@@ -272,13 +269,11 @@ resource "aws_iam_role" "codedeploy_service" {
   tags = local.common_tags
 }
 
-# CodeDeploy Service Policy
 resource "aws_iam_role_policy_attachment" "codedeploy_service" {
   role       = aws_iam_role.codedeploy_service.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole"
 }
 
-# EventBridge Role (for S3 to CodePipeline integration)
 resource "aws_iam_role" "eventbridge_service" {
   name = "${local.resource_prefix}-eventbridge-service-role"
 
@@ -296,7 +291,6 @@ resource "aws_iam_role" "eventbridge_service" {
   tags = local.common_tags
 }
 
-# EventBridge Policy for CodePipeline
 resource "aws_iam_policy" "eventbridge_codepipeline" {
   name        = "${local.resource_prefix}-eventbridge-codepipeline-policy"
   description = "Allows EventBridge to trigger CodePipeline"
