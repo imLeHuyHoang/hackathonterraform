@@ -124,3 +124,4 @@ resource "aws_iam_instance_profile" "ec2_profile" {
   name = "${var.environment}-ec2-instance-profile"
   role = var.ec2_instance_role_name
 }
+
