@@ -93,7 +93,7 @@ module "compute" {
   depends_on = [module.foundation, module.storage, module.cicd]
 }
 
-# S3 bucket notification - CHỈ Lambda trigger, KHÔNG EventBridge global
+# S3 bucket notification - Lambda trigger + EventBridge global
 resource "aws_s3_bucket_notification" "main_bucket_notification" {
   bucket = module.storage.main_bucket_id
 
@@ -105,7 +105,8 @@ resource "aws_s3_bucket_notification" "main_bucket_notification" {
     filter_suffix       = ".xlsx"
   }
 
-  # DISABLED: eventbridge = true  ← QUAN TRỌNG: Không enable global EventBridge
+  # ENABLE EventBridge global để EventBridge rules có thể nhận S3 events
+  eventbridge = true
 
   depends_on = [
     module.compute.lambda_permission_for_s3_data_processor

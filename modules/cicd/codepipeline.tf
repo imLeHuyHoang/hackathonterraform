@@ -39,7 +39,7 @@ resource "aws_codepipeline" "win2016" {
       run_order       = 1
 
       configuration = {
-        ApplicationName     = aws_codedeploy_app.windows_patch_app.name
+        ApplicationName     = aws_codedeploy_app.win2016.name
         DeploymentGroupName = aws_codedeploy_deployment_group.win2016.deployment_group_name
       }
     }
@@ -89,7 +89,7 @@ resource "aws_codepipeline" "win2019" {
       run_order       = 1
 
       configuration = {
-        ApplicationName     = aws_codedeploy_app.windows_patch_app.name
+        ApplicationName     = aws_codedeploy_app.win2019.name
         DeploymentGroupName = aws_codedeploy_deployment_group.win2019.deployment_group_name
       }
     }
@@ -139,7 +139,7 @@ resource "aws_codepipeline" "win2022" {
       run_order       = 1
 
       configuration = {
-        ApplicationName     = aws_codedeploy_app.windows_patch_app.name
+        ApplicationName     = aws_codedeploy_app.win2022.name
         DeploymentGroupName = aws_codedeploy_deployment_group.win2022.deployment_group_name
       }
     }

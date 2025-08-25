@@ -7,7 +7,8 @@ output "pipelines" {
 }
 
 output "codedeploy_application_name" {
-  value = aws_codedeploy_app.windows_patch_app.name
+  description = "Name of CodeDeploy application"
+  value       = aws_codedeploy_app.win2022.name
 }
 
 # CloudWatch Log Groups outputs

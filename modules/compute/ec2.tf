@@ -41,6 +41,9 @@ resource "aws_instance" "win2016" {
     Environment      = var.environment
     WindowsVersion   = "2016"
     DeploymentTarget = "win2016"
+    # CodeDeploy targeting tags
+    CodeDeployApp    = "win2016"
+    ServerType       = "windows-server-2016"
   })
 }
 
@@ -79,6 +82,9 @@ resource "aws_instance" "win2019" {
     Environment      = var.environment
     WindowsVersion   = "2019"
     DeploymentTarget = "win2019"
+    # CodeDeploy targeting tags
+    CodeDeployApp    = "win2019"
+    ServerType       = "windows-server-2019"
   })
 }
 
@@ -117,6 +123,9 @@ resource "aws_instance" "win2022" {
     Environment      = var.environment
     WindowsVersion   = "2022"
     DeploymentTarget = "win2022" # 🎯 CodeDeploy targeting
+    # CodeDeploy targeting tags
+    CodeDeployApp    = "win2022"
+    ServerType       = "windows-server-2022"
   })
 }
 
