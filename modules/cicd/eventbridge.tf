@@ -14,7 +14,7 @@ resource "aws_cloudwatch_event_rule" "trigger_pipeline_win2016" {
       }
       object = {
         key = [{
-          equals = "${var.deployment_packages_prefix}windows-server-2016/latest-deployment.zip"
+          prefix = "${var.deployment_packages_prefix}windows-server-2016/latest-deployment.zip"
         }]
       }
     }
@@ -45,7 +45,7 @@ resource "aws_cloudwatch_event_rule" "trigger_pipeline_win2019" {
       }
       object = {
         key = [{
-          equals = "${var.deployment_packages_prefix}windows-server-2019/latest-deployment.zip"
+          prefix = "${var.deployment_packages_prefix}windows-server-2019/latest-deployment.zip"
         }]
       }
     }
@@ -76,7 +76,7 @@ resource "aws_cloudwatch_event_rule" "trigger_pipeline_win2022" {
       }
       object = {
         key = [{
-          equals = "${var.deployment_packages_prefix}windows-server-2022/latest-deployment.zip"
+          prefix = "${var.deployment_packages_prefix}windows-server-2022/latest-deployment.zip"
         }]
       }
     }
@@ -92,4 +92,3 @@ resource "aws_cloudwatch_event_target" "pipeline_win2022" {
   arn       = aws_codepipeline.win2022.arn
   role_arn  = var.eventbridge_service_role_arn
 }
-
