@@ -13,9 +13,7 @@ resource "aws_cloudwatch_event_rule" "trigger_pipeline_win2016" {
         name = [var.main_bucket_name]
       }
       object = {
-        key = [{
-          prefix = "${var.deployment_packages_prefix}windows-server-2016/"
-        }]
+        key = ["${var.deployment_packages_prefix}windows-server-2016/latest-deployment.zip"]
       }
     }
   })
@@ -44,9 +42,7 @@ resource "aws_cloudwatch_event_rule" "trigger_pipeline_win2019" {
         name = [var.main_bucket_name]
       }
       object = {
-        key = [{
-          prefix = "${var.deployment_packages_prefix}windows-server-2019/"
-        }]
+        key = ["${var.deployment_packages_prefix}windows-server-2019/latest-deployment.zip"]
       }
     }
   })
@@ -75,9 +71,7 @@ resource "aws_cloudwatch_event_rule" "trigger_pipeline_win2022" {
         name = [var.main_bucket_name]
       }
       object = {
-        key = [{
-          prefix = "${var.deployment_packages_prefix}windows-server-2022/"
-        }]
+        key = ["${var.deployment_packages_prefix}windows-server-2022/latest-deployment.zip"]
       }
     }
   })
