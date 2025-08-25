@@ -92,4 +92,4 @@ resource "aws_cloudwatch_event_target" "pipeline_win2022" {
   arn       = aws_codepipeline.win2022.arn
   role_arn  = var.eventbridge_service_role_arn
 }
-}
+
