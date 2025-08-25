@@ -93,20 +93,19 @@ module "compute" {
   depends_on = [module.foundation, module.storage, module.cicd]
 }
 
-# Khôi phục S3 bucket notification ở main.tf
+# S3 bucket notification - CHỈ Lambda trigger, KHÔNG EventBridge global
 resource "aws_s3_bucket_notification" "main_bucket_notification" {
   bucket = module.storage.main_bucket_id
 
-  # Chỉ Lambda trigger cho Excel files (.xlsx)
+  # Lambda trigger chỉ cho Excel files trong raw-vulnerability-data/
   lambda_function {
     lambda_function_arn = module.compute.data_processor_function_arn
     events              = ["s3:ObjectCreated:*"]
-    filter_prefix       = var.raw_data_prefix
+    filter_prefix       = var.raw_data_prefix  # "raw-vulnerability-data/"
     filter_suffix       = ".xlsx"
   }
 
-  # EventBridge cho deployment packages
-  eventbridge = true
+  # DISABLED: eventbridge = true  ← QUAN TRỌNG: Không enable global EventBridge
 
   depends_on = [
     module.compute.lambda_permission_for_s3_data_processor
