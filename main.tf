@@ -88,6 +88,7 @@ module "compute" {
   key_name               = var.key_name
   ec2_instance_role_name = module.foundation.ec2_instance_role_name
   ec2_instance_type      = var.ec2_instance_type
+  ebs_volume_size        = var.ebs_volume_size
 
   depends_on = [module.foundation, module.storage, module.cicd]
 }

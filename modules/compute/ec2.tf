@@ -24,7 +24,7 @@ resource "aws_instance" "win2016" {
 
   root_block_device {
     volume_type           = "gp3"
-    volume_size           = 30
+    volume_size           = var.ebs_volume_size
     delete_on_termination = true
     encrypted             = false
 
@@ -64,7 +64,7 @@ resource "aws_instance" "win2019" {
 
   root_block_device {
     volume_type           = "gp3"
-    volume_size           = 30
+    volume_size           = var.ebs_volume_size
     delete_on_termination = true
     encrypted             = false
 
@@ -102,7 +102,7 @@ resource "aws_instance" "win2022" {
 
   root_block_device {
     volume_type           = "gp3"
-    volume_size           = 30
+    volume_size           = var.ebs_volume_size
     delete_on_termination = true
     encrypted             = false
 

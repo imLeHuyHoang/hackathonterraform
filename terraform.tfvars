@@ -21,4 +21,4 @@ win2022_ami_id = "ami-04a9b7f1b67bebd6f"
 key_name = "my-hackathon-key"
 deployment_packages_prefix = "deployment-packages/"
 
-ec2_instance_type = "m7i.xlarge"
+ec2_instance_type = "c6a.xlarge"

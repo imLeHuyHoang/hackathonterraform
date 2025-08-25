@@ -46,6 +46,12 @@ variable "ec2_instance_type" {
   type        = string
 }
 
+variable "ebs_volume_size" {
+  description = "EBS root volume size in GB"
+  type        = number
+  default     = 60
+}
+
 # S3 Configuration
 variable "raw_data_prefix" {
   description = "S3 prefix for raw vulnerability data"
